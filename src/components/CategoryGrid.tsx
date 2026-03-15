@@ -9,25 +9,26 @@ export function CategoryGrid({ categories }: CategoryGridProps) {
   if (!categories.length) return null;
 
   return (
-    <section className="section-py bg-[var(--surface-warm)]">
+    <section className="section-py gradient-subtle">
       <div className="container">
 
         {/* Section header */}
-        <div className="mb-12 flex flex-col items-center text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
+        <div className="mb-16 flex flex-col items-center text-center sm:flex-row sm:items-end sm:justify-between sm:text-left">
           <div>
-            <p className="section-label mb-3">Our Collections</p>
+            <p className="section-label mb-4">Our Collections</p>
             <h2 className="section-heading">
               Find Your
               <em className="not-italic text-[var(--primary)]"> Care</em>
             </h2>
+            <div className="mt-4 separator-gold mx-auto sm:mx-0" />
           </div>
-          <p className="mt-4 max-w-xs section-sub sm:mt-0 sm:text-right">
+          <p className="mt-6 max-w-xs section-sub sm:mt-0 sm:text-right">
             Trusted products across every health and wellness category.
           </p>
         </div>
 
         {/* Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 stagger-children">
           {categories.map((cat, i) => (
             <CategoryTile
               key={cat.id}

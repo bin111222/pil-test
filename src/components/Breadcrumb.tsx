@@ -12,19 +12,19 @@ export interface BreadcrumbProps {
 
 export function Breadcrumb({ items, className = "" }: BreadcrumbProps) {
   return (
-    <nav aria-label="Breadcrumb" className={`text-sm ${className}`}>
-      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[var(--muted)]">
+    <nav aria-label="Breadcrumb" className={`text-[13px] ${className}`}>
+      <ol className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[var(--muted-light)]">
         {items.map((item, i) => (
-          <li key={i} className="flex items-center gap-x-2">
+          <li key={i} className="flex items-center gap-x-2.5">
             {i > 0 && (
-              <span className="text-[var(--border)]" aria-hidden>
-                /
-              </span>
+              <svg className="h-3 w-3 text-[var(--border)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+              </svg>
             )}
             {item.href ? (
               <Link
                 href={item.href}
-                className="transition hover:text-[var(--foreground)] hover:underline"
+                className="transition-colors duration-200 hover:text-[var(--foreground)]"
               >
                 {item.label}
               </Link>

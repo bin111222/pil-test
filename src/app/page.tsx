@@ -1,11 +1,9 @@
-import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { TrustStrip } from "@/components/TrustStrip";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { BestsellerCarousel } from "@/components/BestsellerCarousel";
 import { WhyTrust } from "@/components/WhyTrust";
 import { Testimonials } from "@/components/Testimonials";
-import { Footer } from "@/components/Footer";
 import { getHomepageCollections, getBestsellerProducts } from "@/lib/shopify";
 
 export default async function Home() {
@@ -16,7 +14,6 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      <Header />
       <main>
         <Hero />
         <TrustStrip />
@@ -24,7 +21,6 @@ export default async function Home() {
         <BestsellerCarousel products={bestsellers} />
         <WhyTrust />
         <Testimonials />
-        <Footer />
       </main>
     </div>
   );

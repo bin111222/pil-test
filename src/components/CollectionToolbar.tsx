@@ -34,20 +34,21 @@ export function CollectionToolbar({
 
   return (
     <div
-      className={`flex flex-col gap-4 border-b border-[var(--border)] pb-4 sm:flex-row sm:items-center sm:justify-between ${className}`}
+      className={`flex flex-col gap-4 border-b border-[var(--border)] pb-5 sm:flex-row sm:items-center sm:justify-between ${className}`}
     >
-      <p className="text-sm text-[var(--muted)]">
+      <p className="text-[13px] text-[var(--muted)]">
         {productCount} {productCount === 1 ? "product" : "products"}
       </p>
-      <div className="flex items-center gap-2">
-        <label htmlFor="collection-sort" className="text-sm font-medium text-[var(--foreground)]">
+      <div className="flex items-center gap-3">
+        <label htmlFor="collection-sort" className="text-[12px] font-semibold tracking-[0.1em] uppercase text-[var(--muted-light)]">
           Sort by
         </label>
         <select
           id="collection-sort"
           value={currentSort}
           onChange={(e) => onSortChange(e.target.value)}
-          className="rounded-lg border border-[var(--border)] bg-white px-3 py-2 text-sm text-[var(--foreground)] focus:border-[var(--primary)] focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
+          className="appearance-none rounded-full border border-[var(--border)] bg-white px-5 py-2.5 pr-10 text-[13px] font-medium text-[var(--foreground)] transition-all duration-200 focus:border-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/10 hover:border-[var(--primary)]/30"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%236B7C74' viewBox='0 0 24 24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center' }}
         >
           {SORT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>

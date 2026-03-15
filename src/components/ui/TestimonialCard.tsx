@@ -1,3 +1,5 @@
+"use client";
+
 export interface TestimonialCardProps {
   title: string;
   quote: string;
@@ -13,7 +15,7 @@ function StarRating({ rating = 5 }: { rating?: number }) {
       {Array.from({ length: 5 }).map((_, i) => (
         <svg
           key={i}
-          className={`h-4 w-4 ${i < rating ? "text-[var(--accent)]" : "text-[var(--border)]"}`}
+          className={`h-3.5 w-3.5 ${i < rating ? "text-[var(--accent)]" : "text-[var(--border)]"}`}
           viewBox="0 0 20 20"
           fill="currentColor"
         >
@@ -41,37 +43,40 @@ export function TestimonialCard({
 
   return (
     <blockquote
-      className={`group flex flex-col rounded-2xl border border-[var(--border)] bg-white p-6 shadow-[var(--shadow-sm)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[var(--shadow-lg)] ${className}`}
+      className={`group flex flex-col rounded-2xl border border-[var(--border)] bg-white p-7 transition-all duration-500 hover:-translate-y-2 hover:border-[var(--primary)]/[0.12] ${className}`}
+      style={{ boxShadow: 'var(--shadow-sm)', transitionTimingFunction: 'var(--ease-out-expo)' }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-xl)'; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-sm)'; }}
     >
       {/* Stars */}
       <StarRating rating={rating} />
 
       {/* Large quote mark */}
-      <div className="my-3 font-display text-5xl leading-none text-[var(--primary)]/15 select-none">
+      <div className="my-4 font-display text-5xl leading-none text-[var(--primary)]/[0.1] select-none">
         &ldquo;
       </div>
 
       {/* Title */}
-      <h3 className="font-semibold text-[var(--foreground)] leading-snug">{title}</h3>
+      <h3 className="text-[15px] font-semibold text-[var(--foreground)] leading-snug tracking-tight">{title}</h3>
 
       {/* Quote */}
-      <p className="mt-2 flex-1 text-sm leading-relaxed text-[var(--muted)] line-clamp-4">
+      <p className="mt-3 flex-1 text-sm leading-[1.75] text-[var(--muted)] line-clamp-4">
         {quote}
       </p>
 
       {/* Author */}
-      <footer className="mt-5 flex items-center gap-3 border-t border-[var(--border-subtle)] pt-5">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--primary-subtle)] text-xs font-bold text-[var(--primary)]">
+      <footer className="mt-6 flex items-center gap-3.5 border-t border-[var(--border-subtle)] pt-6">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--primary-subtle)] to-[var(--accent-light)]/30 text-[11px] font-bold tracking-wide text-[var(--primary)]">
           {initials}
         </div>
         <div className="min-w-0">
           <div className="text-sm font-semibold text-[var(--foreground)] truncate">{author}</div>
           {category && (
-            <div className="text-xs text-[var(--muted)] truncate">{category}</div>
+            <div className="text-[11px] text-[var(--muted-light)] truncate mt-0.5">{category}</div>
           )}
         </div>
         <div className="ml-auto">
-          <span className="rounded-full bg-[var(--primary-subtle)] px-2.5 py-1 text-[10px] font-semibold tracking-wide text-[var(--primary)] uppercase">
+          <span className="rounded-full bg-[var(--primary-subtle)] px-3 py-1 text-[9px] font-bold tracking-[0.15em] text-[var(--primary)] uppercase">
             Verified
           </span>
         </div>

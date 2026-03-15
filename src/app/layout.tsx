@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { getAllCollectionsForNav } from "@/lib/shopify";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,17 +29,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const collections = await getAllCollectionsForNav();
+
   return (
     <html lang="en" className="scroll-smooth">
       <body
         className={`${geistSans.variable} ${playfairDisplay.variable} antialiased`}
       >
+        <Header collections={collections} />
         {children}
+        <Footer collections={collections} />
       </body>
     </html>
   );

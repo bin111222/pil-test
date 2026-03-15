@@ -1,6 +1,6 @@
 import { shopifyFetch, isShopifyConfigured } from "./client";
 import { COLLECTIONS_FOR_HOMEPAGE, COLLECTION_PRODUCTS, COLLECTION_PAGE, PRODUCT_BY_HANDLE, ALL_PRODUCTS } from "./queries";
-import type { ProductCardData, CategoryTileData, CollectionPageData, ProductDetailData } from "./types";
+import type { ProductCardData, CategoryTileData, CollectionPageData, ProductDetailData, NavCollection } from "./types";
 
 /** Shopify API response shapes (minimal) */
 interface CollectionsResponse {
@@ -49,35 +49,68 @@ function discountPercent(price: number, compareAt: number): string | undefined {
   return pct > 0 ? `${pct}% off` : undefined;
 }
 
-/** Fetch collections for homepage category grid. Returns mock data if Shopify not configured or request fails. */
-export async function getHomepageCollections(): Promise<CategoryTileData[]> {
-  const mock: CategoryTileData[] = [
-    { id: "mock-1", name: "Acne & Skin Care", handle: "skin-care", description: "Facewash, soaps, sunscreen" },
-    { id: "mock-2", name: "Hair & Scalp", handle: "hair-care", description: "Shampoo, serum" },
-    { id: "mock-3", name: "Pain Relief", handle: "pain-managment", description: "Roll on, spray, gel" },
-    { id: "mock-4", name: "Everyday Wellness", handle: "health-wellness", description: "Health & wellness" },
-    { id: "mock-5", name: "Pet Skin & Grooming", handle: "pet-grooming", description: "Pet shampoo, soap" },
-    { id: "mock-6", name: "Cardiac & Diabetic Support", handle: "cardiac-diabetic-care", description: "Cardiac & diabetic range" },
-  ];
+/** Canonical product categories – matches product filters and nav. Homepage always shows these; Shopify fills in images/descriptions when available. */
+const HOMEPAGE_CATEGORIES: Omit<CategoryTileData, "id">[] = [
+  { name: "Skin Care",     handle: "skin-care",               description: "Face wash, soaps, sunscreen & moisturizers" },
+  { name: "Hair Care",     handle: "hair-care",               description: "Shampoo, serum & scalp care" },
+  { name: "Body Care",     handle: "body-care",               description: "Soaps, creams & body care" },
+  { name: "Oral Care",     handle: "oral-care",               description: "Mouth gel & oral hygiene" },
+  { name: "Foot Care",     handle: "foot-care",               description: "Foot cream & foot care" },
+  { name: "Pain Relief",   handle: "pain-managment",          description: "Roll on, spray & gel" },
+  { name: "Pet Care",      handle: "pet-care",                description: "Pet shampoo, soap & grooming" },
+  { name: "Medicines",     handle: "medicines",               description: "Cough, cold & wellness" },
+];
 
-  if (!isShopifyConfigured()) return mock;
+/** Fetch collections for homepage category grid. Uses canonical product categories; Shopify data (when available) only enriches with images/descriptions. */
+export async function getHomepageCollections(): Promise<CategoryTileData[]> {
+  const fallback: CategoryTileData[] = HOMEPAGE_CATEGORIES.map((cat, i) => ({
+    id: `cat-${cat.handle}`,
+    ...cat,
+    imageSrc: null,
+    imageAlt: undefined,
+  }));
+
+  if (!isShopifyConfigured()) return fallback;
 
   try {
-    const data = await shopifyFetch<CollectionsResponse>(COLLECTIONS_FOR_HOMEPAGE, { first: 6 });
+    const data = await shopifyFetch<CollectionsResponse>(COLLECTIONS_FOR_HOMEPAGE, { first: 50 });
     const edges = data.collections?.edges ?? [];
-    if (edges.length === 0) return mock;
+    const byHandle = new Map(
+      edges.map(({ node }) => [node.handle.toLowerCase(), node])
+    );
 
-    return edges.map(({ node }) => ({
-      id: node.id,
-      name: node.title,
-      handle: node.handle,
-      description: node.description?.slice(0, 80) ?? undefined,
-      imageSrc: node.image?.url ?? null,
-      imageAlt: node.image?.altText ?? undefined,
-    }));
+    return HOMEPAGE_CATEGORIES.map((cat, i) => {
+      const shopify = byHandle.get(cat.handle.toLowerCase());
+      if (shopify) {
+        return {
+          id: shopify.id,
+          name: cat.name,
+          handle: cat.handle,
+          description: shopify.description?.slice(0, 80) ?? cat.description,
+          imageSrc: shopify.image?.url ?? null,
+          imageAlt: shopify.image?.altText ?? undefined,
+        };
+      }
+      return {
+        id: `cat-${cat.handle}`,
+        ...cat,
+        imageSrc: null,
+        imageAlt: undefined,
+      };
+    });
   } catch {
-    return mock;
+    return fallback;
   }
+}
+
+/** Fetch collections for header/footer nav. Returns minimal { id, title, handle } list. */
+export async function getAllCollectionsForNav(): Promise<NavCollection[]> {
+  const categories = await getHomepageCollections();
+  return categories.map((c) => ({
+    id: c.id,
+    title: c.name,
+    handle: c.handle,
+  }));
 }
 
 /** Fetch bestseller products. Tries "bestsellers" collection first, falls back to top products from all-products. */
@@ -169,12 +202,54 @@ const MOCK_COLLECTION_PRODUCTS: ProductCardData[] = [
   { id: "mock-6", title: "Neem Plus Pet Shampoo", handle: "neem-plus-pet-shampoo", price: "₹ 199.00", pricePrefix: "From", compareAtPrice: "₹ 293.64", discountLabel: "32% off" },
 ];
 
-/** Fetch collection by handle for collection page. Returns mock data if Shopify not configured or request fails. */
+/** Handles that represent our product categories – collection pages for these show products filtered by tag (same as main products list). */
+const CATEGORY_HANDLES = new Set(HOMEPAGE_CATEGORIES.map((c) => c.handle.toLowerCase()));
+
+function parsePriceFromDisplay(str: string): number {
+  const m = str.replace(/,/g, "").match(/[\d.]+/);
+  return m ? parseFloat(m[0]) : 0;
+}
+
+function sortProducts(products: ProductCardData[], sortKey?: CollectionSortKey): ProductCardData[] {
+  if (!sortKey || sortKey === "RELEVANCE" || sortKey === "BEST_SELLING" || sortKey === "CREATED") {
+    return [...products];
+  }
+  const sorted = [...products];
+  if (sortKey === "TITLE") {
+    sorted.sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: "base" }));
+  } else if (sortKey === "PRICE") {
+    sorted.sort((a, b) => parsePriceFromDisplay(a.price) - parsePriceFromDisplay(b.price));
+  }
+  return sorted;
+}
+
+/** Fetch collection by handle for collection page. For canonical category handles, products are filtered by tag (matching main products list); otherwise uses Shopify collection. */
 export async function getCollectionPageData(
   handle: string,
   sortKey?: CollectionSortKey,
   first = 24
 ): Promise<CollectionPageData | null> {
+  const handleLower = handle.toLowerCase();
+  const isCategory = CATEGORY_HANDLES.has(handleLower);
+  const meta = HOMEPAGE_CATEGORIES.find((c) => c.handle.toLowerCase() === handleLower);
+
+  if (isCategory && meta) {
+    const allProducts = await getAllProducts(250);
+    const filtered = allProducts.filter((p) => (p.tags ?? []).includes(handleLower));
+    const sorted = sortProducts(filtered, sortKey);
+    const products = sorted.slice(0, first);
+
+    return {
+      id: `cat-${meta.handle}`,
+      title: meta.name,
+      handle: meta.handle,
+      description: meta.description,
+      imageSrc: null,
+      imageAlt: undefined,
+      products,
+    };
+  }
+
   const mockTitle = handle.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
   const mock: CollectionPageData = {
     id: `mock-${handle}`,

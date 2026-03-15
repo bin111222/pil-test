@@ -1,7 +1,5 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { CollectionToolbar } from "@/components/CollectionToolbar";
 import { ProductGrid } from "@/components/ProductGrid";
@@ -47,23 +45,23 @@ export default async function CollectionPage({
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      <Header />
-      <main className="mx-auto max-w-7xl px-4 pb-16 sm:px-6">
-        <Breadcrumb items={breadcrumbItems} className="pt-6 pb-4" />
+      <main className="mx-auto max-w-7xl px-5 pb-20 sm:px-8 lg:px-10">
+        <Breadcrumb items={breadcrumbItems} className="pt-8 pb-6" />
 
-        <div className="pb-8">
-          <h1 className="text-2xl font-semibold tracking-tight text-[var(--foreground)] sm:text-3xl">
+        <div className="pb-10">
+          <h1 className="font-display text-[2rem] font-bold tracking-tight text-[var(--foreground)] sm:text-[2.5rem] leading-[1.1]">
             {data.title}
           </h1>
           {data.description && (
-            <p className="mt-2 max-w-2xl text-[var(--muted)]">{data.description}</p>
+            <p className="mt-3 max-w-2xl text-base text-[var(--muted)] leading-relaxed">{data.description}</p>
           )}
+          <div className="mt-4 separator-gold" />
         </div>
 
         <Suspense
           fallback={
-            <div className="flex items-center gap-2 border-b border-[var(--border)] pb-4">
-              <span className="text-sm text-[var(--muted)]">Loading…</span>
+            <div className="flex items-center gap-2 border-b border-[var(--border)] pb-5">
+              <span className="text-[13px] text-[var(--muted)]">Loading…</span>
             </div>
           }
         >
@@ -73,13 +71,12 @@ export default async function CollectionPage({
           />
         </Suspense>
 
-        <div className="mt-8">
+        <div className="mt-10">
           <ProductGrid products={data.products} />
         </div>
 
         <TrustCallout />
       </main>
-      <Footer />
     </div>
   );
 }

@@ -1,6 +1,4 @@
 import { Suspense } from "react";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { getAllProducts } from "@/lib/shopify";
 import { ProductsClientShell } from "./ProductsClientShell";
 
@@ -16,29 +14,29 @@ export default async function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      <Header />
       <main>
         {/* Page header */}
         <div className="border-b border-[var(--border)] bg-white">
-          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <h1 className="font-display text-2xl font-semibold tracking-tight text-[var(--foreground)] sm:text-3xl">
+          <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:px-10">
+            <p className="section-label mb-4">Browse</p>
+            <h1 className="font-display text-[2rem] font-bold tracking-tight text-[var(--foreground)] sm:text-[2.5rem]">
               All Products
             </h1>
-            <p className="mt-1 text-sm text-[var(--muted)]">
+            <div className="mt-4 separator-gold" />
+            <p className="mt-4 text-[13px] text-[var(--muted)]">
               {products.length} product{products.length !== 1 ? "s" : ""} · Science-backed healthcare from PIL
             </p>
           </div>
         </div>
 
         <Suspense fallback={
-          <div className="mx-auto max-w-7xl px-4 py-20 text-center text-[var(--muted)]">
+          <div className="mx-auto max-w-7xl px-5 py-24 text-center text-[var(--muted)]">
             Loading products…
           </div>
         }>
           <ProductsClientShell products={products} />
         </Suspense>
       </main>
-      <Footer />
     </div>
   );
 }

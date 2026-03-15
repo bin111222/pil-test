@@ -7,7 +7,6 @@ export interface CategoryTileProps {
   href: string;
   imageSrc?: string | null;
   imageAlt?: string;
-  /** Optional: make a tile span 2 columns */
   featured?: boolean;
 }
 
@@ -33,7 +32,7 @@ export function CategoryTile({
           alt={imageAlt ?? name}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+          className="object-cover transition-transform duration-[900ms] ease-[var(--ease-out-expo)] group-hover:scale-[1.08]"
         />
       ) : (
         <div className="absolute inset-0 gradient-primary" />
@@ -43,31 +42,31 @@ export function CategoryTile({
       <div className="absolute inset-0 gradient-card-overlay" />
 
       {/* Hover tint */}
-      <div className="absolute inset-0 bg-[var(--primary)]/0 transition-colors duration-500 group-hover:bg-[var(--primary)]/15" />
+      <div className="absolute inset-0 bg-[var(--primary)]/0 transition-colors duration-700 group-hover:bg-[var(--primary)]/[0.12]" />
 
       {/* Arrow chip — top right */}
-      <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm ring-1 ring-white/20 transition-all duration-300 group-hover:bg-white group-hover:shadow-lg">
+      <div className="absolute right-5 top-5 flex h-10 w-10 items-center justify-center rounded-full bg-white/15 backdrop-blur-md ring-1 ring-white/20 transition-all duration-500 ease-[var(--ease-out-expo)] group-hover:bg-white group-hover:shadow-[var(--shadow-lg)] group-hover:scale-105">
         <svg
-          className="h-4 w-4 text-white transition-colors duration-300 group-hover:text-[var(--primary)]"
+          className="h-4 w-4 text-white transition-all duration-500 group-hover:text-[var(--primary)] group-hover:translate-x-0.5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
             d="M17 8l4 4m0 0l-4 4m4-4H3" />
         </svg>
       </div>
 
       {/* Bottom text */}
-      <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
-        <p className="text-xs font-semibold tracking-widest uppercase text-white/60 mb-1">
+      <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-7">
+        <p className="text-[10px] font-semibold tracking-[0.25em] uppercase text-white/50 mb-2">
           Explore
         </p>
-        <h3 className="font-display text-xl font-semibold text-white sm:text-2xl">
+        <h3 className="font-display text-xl font-semibold text-white sm:text-2xl tracking-tight">
           {name}
         </h3>
         {description && (
-          <p className="mt-1 max-w-xs text-sm text-white/70 line-clamp-1 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <p className="mt-2 max-w-xs text-sm text-white/60 line-clamp-1 translate-y-3 opacity-0 transition-all duration-500 ease-[var(--ease-out-expo)] group-hover:translate-y-0 group-hover:opacity-100">
             {description}
           </p>
         )}

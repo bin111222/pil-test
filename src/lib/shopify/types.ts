@@ -1,3 +1,10 @@
+/** Minimal collection shape for header/footer nav */
+export interface NavCollection {
+  id: string;
+  title: string;
+  handle: string;
+}
+
 /** Shapes used by our UI; can be populated from Shopify or mock data */
 export interface ProductCardData {
   id: string;
